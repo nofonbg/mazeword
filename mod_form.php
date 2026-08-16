@@ -17,8 +17,6 @@ class mod_mazeword_mod_form extends moodleform_mod {
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-        $this->standard_intro_elements();
-
         $mform->addElement('header', 'mazewordsection', get_string('mazewordsettings', 'mod_mazeword'));
 
         $mform->addElement('text', 'solutionword', get_string('solutionword', 'mod_mazeword'), ['size' => '40']);
