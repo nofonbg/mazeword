@@ -1,6 +1,7 @@
 # mazeword
 find a solution word in a maze
-pix/icon_large.svg
+![](https://github.com/nofonbg/mazeword/blob/main/pix/icon_large.svg)  
+
 # Modul: Maze Word (mod_mazeword)
 
 Ein interaktives Labyrinth-Worträtsel fuer Moodle.
