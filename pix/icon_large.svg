@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 50" width="150" height="50">
+  <defs>
+    <linearGradient id="bgLarge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3498db"/>
+      <stop offset="100%" style="stop-color:#2980b9"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect x="1" y="1" width="148" height="48" rx="4" fill="url(#bgLarge)" stroke="#2c3e50" stroke-width="1"/>
+  <!-- Maze icon -->
+  <g transform="translate(10, 10)" stroke="#ecf0f1" stroke-width="1.2" stroke-linecap="round" fill="none">
+    <path d="M2 2 L2 10 L6 10 L6 6 L14 6 L14 14 L10 14 L10 18 L18 18"/>
+    <path d="M2 6 L6 6"/>
+    <path d="M10 2 L10 6 L14 6"/>
+    <path d="M14 10 L18 10"/>
+    <path d="M6 14 L6 18"/>
+    <path d="M14 14 L18 14"/>
+  </g>
+  <circle cx="12" cy="12" r="2" fill="#27ae60"/>
+  <!-- Text -->
+  <text x="38" y="22" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#ecf0f1">Maze Word</text>
+  <text x="38" y="36" font-family="Arial, sans-serif" font-size="8" fill="#bdc3c7">Labyrinth Rätsel</text>
+</svg>
