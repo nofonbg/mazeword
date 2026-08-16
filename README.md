@@ -17,7 +17,7 @@ Schueler navigieren durch ein generiertes 20x20-Labyrinth und suchen den Weg, de
 
 ### Features
 
-- **Dynamisches Labyrinth** – wird bei jedem Start neu generiert (10x10 bis 30x30)
+- **Dynamisches Labyrinth** – wird bei jedem Start neu generiert (10x10 bis 30x30, derzeit nur 20x20)
 - **Loesungswort** – Buchstaben auf dem korrekten Weg, werden rot gesammelt
 - **Wurm-Effekt** – gesammelte Buchstaben folgen dem Cursor als Kette
 - **Sackgassen** – 3 Ablenkungswörter in Nebenwegen
