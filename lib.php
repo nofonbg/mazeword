@@ -16,7 +16,6 @@ function mazeword_supports($feature): mixed {
         FEATURE_MOD_ARCHETYPE => MOD_ARCHETYPE_ACTIVITY,
         FEATURE_GROUPS => true,
         FEATURE_GROUPINGS => true,
-        FEATURE_MOD_INTRO => true,
         FEATURE_COMPLETION_TRACKS_VIEWS => true,
         FEATURE_GRADE_HAS_GRADE => false,
         FEATURE_GRADE_OUTCOMES => false,
@@ -40,9 +39,6 @@ function mazeword_add_instance(stdClass $data, ?object $mform = null): int {
     $data->timemodified = $data->timecreated;
 
     // Ensure default values for required fields.
-    if (!isset($data->intro)) {
-        $data->intro = '';
-    }
     if (!isset($data->introformat)) {
         $data->introformat = FORMAT_HTML;
     }
