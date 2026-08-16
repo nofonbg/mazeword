@@ -1,6 +1,8 @@
 # mazeword
-find a solution word in a maze 
-nor issues nor pull requests nor anything else will be responded, use as it is. 
+find a solution word in a maze  
+
+nor issues nor pull requests nor anything else will be responded, use as it is
+
 tested only with moodle 5.3dev(Build: 20260807) 
 
 ![](https://github.com/nofonbg/mazeword/blob/main/pix/icon_large.svg)  
