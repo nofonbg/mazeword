@@ -1,5 +1,6 @@
 # mazeword
-find a solution word in a maze
+find a solution word in a maze 
+
 ![](https://github.com/nofonbg/mazeword/blob/main/pix/icon_large.svg)  
 
 # Modul: Maze Word (mod_mazeword)
