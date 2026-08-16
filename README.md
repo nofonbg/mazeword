@@ -5,6 +5,8 @@ neither issues nor pull requests nor anything else will be responded, use as it 
 
 tested only with moodle 5.3dev(Build: 20260807) 
 
+created with MiMo V2.5
+
 ![](https://github.com/nofonbg/mazeword/blob/main/pix/icon_large.svg)  
 
 # Modul: Maze Word (mod_mazeword)
