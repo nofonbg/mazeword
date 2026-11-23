@@ -175,6 +175,11 @@ Norbert Forster
 
 ## Changelog
 
+### Version 1.2 (2026-11-23)
+- Überlauf Spielfeld korrigiert
+- Randspalte und -zeile korrigiert
+- todo: Hinweis auf Spielfeldgröße bei langen Lösungswörtern
+
 ### Version 1.1 (2026-08-09)
 - Umlaute (Ä, Ö, Ü) unterstuetzt, ß wird zu SS konvertiert
 - Backup/Restore-Funktionalitaet hinzugefuegt
