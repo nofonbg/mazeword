@@ -18,11 +18,11 @@ Ein interaktives Labyrinth-Worträtsel fur Moodle.
 
 ## Beschreibung
 
-Schüler navigieren durch ein generiertes 20x20-Labyrinth und suchen den Weg, der das Lösungswort bildet. Die Buchstaben des Lösungswortes werden rot hervorgehoben und "folgen" dem Spieler als Kette. Sackgassen enthalten falsche Wörter als Ablenkung. Beim Erreichen des Ziels mit allen gesammelten Buchstaben gibt es ein Feürwerk.
+Schüler navigieren durch ein generiertes Labyrinth und suchen den Weg, der das Lösungswort bildet. Die Buchstaben des Lösungswortes werden rot hervorgehoben und "folgen" dem Spieler als Kette. Sackgassen enthalten falsche Wörter als Ablenkung. Beim Erreichen des Ziels mit allen gesammelten Buchstaben gibt es ein Feuerwerk.
 
 ### Features
 
-- **Dynamisches Labyrinth** – wird bei jedem Start neu generiert (10x10 bis 30x30, derzeit nur 20x20)
+- **Dynamisches Labyrinth** – wird bei jedem Start neu generiert (11x11 bis 29x29)
 - **Loesungswort** – Buchstaben auf dem korrekten Weg, werden rot gesammelt
 - **Wurm-Effekt** – gesammelte Buchstaben folgen dem Cursor als Kette
 - **Sackgassen** – 3 Ablenkungswörter in Nebenwegen
