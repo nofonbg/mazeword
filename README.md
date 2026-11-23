@@ -3,7 +3,7 @@ find a solution word in a maze
 
 neither issues nor pull requests nor anything else will be responded, use as it is!
 
-tested only with moodle 5.3dev(Build: 20260807) 
+tested only with moodle 6dev(Build: 20261117) 
 
 created with MiMo V2.5
 
