@@ -12,10 +12,12 @@ class mod_mazeword_mod_form extends moodleform_mod {
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $mform->addElement('text', 'name', get_string('name', 'form'), ['size' => '64']);
+        $mform->addElement('text', 'name', get_string('activityname', 'mod_mazeword'), ['size' => '64']);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+
+        $this->standard_intro_elements();
 
         $mform->addElement('header', 'mazewordsection', get_string('mazewordsettings', 'mod_mazeword'));
 
@@ -37,14 +39,15 @@ class mod_mazeword_mod_form extends moodleform_mod {
         $mform->setType('wrongword3', PARAM_TEXT);
         $mform->addRule('wrongword3', null, 'required', null, 'client');
 
+        // Only odd sizes: they allow a symmetric border wall around the maze.
         $mform->addElement('select', 'mazesize', get_string('mazesize', 'mod_mazeword'), [
-            10 => '10x10',
+            11 => '11x11',
             15 => '15x15',
-            20 => '20x20',
+            21 => '21x21',
             25 => '25x25',
-            30 => '30x30',
+            31 => '31x31',
         ]);
-        $mform->setDefault('mazesize', 20);
+        $mform->setDefault('mazesize', 21);
         $mform->addHelpButton('mazesize', 'mazesize', 'mod_mazeword');
 
         $this->standard_coursemodule_elements();

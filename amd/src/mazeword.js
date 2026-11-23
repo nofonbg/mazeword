@@ -27,12 +27,25 @@ define(['jquery'], function($) {
     }
 
     /**
+     * The maze grid must be odd sized: rooms sit on odd coordinates, the outer
+     * row/column are the (even) border walls. An even configured size would put
+     * the goal on a wall and leave the last row/column unused.
+     *
+     * @param {number} configured - Configured mazesize from the activity form.
+     * @return {number} Odd grid size.
+     */
+    function normalizeSize(configured) {
+        const size = parseInt(configured, 10) || 21;
+        return size % 2 === 0 ? size + 1 : size;
+    }
+
+    /**
      * MazeGame class - handles all game logic.
      */
     class MazeGame {
         constructor(config, savedX, savedY, visitedCells, solutionVisited, completed) {
             this.config = config;
-            this.size = config.mazesize;
+            this.size = normalizeSize(config.mazesize);
             this.solutionWord = config.solutionword;
             this.wrongWords = [config.wrongword1, config.wrongword2, config.wrongword3];
             this.instanceid = config.instanceid;
@@ -45,16 +58,29 @@ define(['jquery'], function($) {
             this.visitedSolutionSet = new Set(solutionVisited);
             this.visitedCellsSet = new Set(visitedCells);
 
-            this.playerPos = { x: savedX, y: savedY };
+            // Start cell: first room inside the border (0,0 used to be the start
+            // before the border was closed). Treat legacy (0,0) as (1,1).
+            this.startPos = { x: 1, y: 1 };
+            let startX = parseInt(savedX, 10);
+            let startY = parseInt(savedY, 10);
+            if (!startX && !startY) {
+                startX = this.startPos.x;
+                startY = this.startPos.y;
+            }
+
+            this.playerPos = { x: startX, y: startY };
             this.goalPos = { x: this.size - 2, y: this.size - 2 };
             this.isGameOver = completed;
-            this.isFirstMove = !completed && savedX === 0 && savedY === 0;
+            this.isFirstMove = !completed && startX === this.startPos.x && startY === this.startPos.y;
 
             this.gridElement = $('#mazeword-grid');
+            this.containerElement = $('#mazeword-container');
             this.statusElement = $('#mazeword-status');
             this.canvas = document.getElementById('mazeword-firework-canvas');
             this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
             this.particles = [];
+            this.cellSize = 0;
+            this.cellFontSize = 16;
 
             this.setupEventListeners();
             this.initGame();
@@ -109,11 +135,26 @@ define(['jquery'], function($) {
             $(window).on('beforeunload.mazeword', function() {
                 self.saveState();
             });
+
+            // Keep the grid square and the background matched on resize.
+            $(window).on('resize.mazeword', function() {
+                self.applyLayout();
+            });
         }
 
         initGame() {
             this.generateMaze();
             this.addExtraDeadEnds();
+
+            // A saved position from an older layout may sit on a wall (or outside
+            // the grid) of the regenerated maze - fall back to the start cell,
+            // otherwise no solution path could be found.
+            const px = this.playerPos.x;
+            const py = this.playerPos.y;
+            if (py < 0 || py >= this.size || px < 0 || px >= this.size ||
+                    this.grid[py][px] !== 1) {
+                this.playerPos = { x: this.startPos.x, y: this.startPos.y };
+            }
 
             // Find solution path.
             const solutionPath = this.findPath(this.playerPos, this.goalPos);
@@ -128,6 +169,7 @@ define(['jquery'], function($) {
             this.restoreVisitedCells();
 
             // Render.
+            this.applyLayout();
             this.render();
             this.updateSolutionTracker();
 
@@ -158,7 +200,7 @@ define(['jquery'], function($) {
                 success: function() {
                     self.visitedSolutionSet = new Set();
                     self.visitedCellsSet = new Set();
-                    self.playerPos = { x: 0, y: 0 };
+                    self.playerPos = { x: self.startPos.x, y: self.startPos.y };
                     self.isGameOver = false;
                     self.isFirstMove = true;
                     self.particles = [];
@@ -170,7 +212,8 @@ define(['jquery'], function($) {
         generateMaze() {
             this.grid = Array(this.size).fill(null).map(() => Array(this.size).fill(0));
             const stack = [];
-            const startNode = { x: 0, y: 0 };
+            // First room inside the border walls.
+            const startNode = { x: this.startPos.x, y: this.startPos.y };
             this.grid[startNode.y][startNode.x] = 1;
             stack.push(startNode);
 
@@ -188,7 +231,10 @@ define(['jquery'], function($) {
                     const nx = current.x + dir.dx;
                     const ny = current.y + dir.dy;
 
-                    if (nx >= 0 && nx < this.size && ny >= 0 && ny < this.size && this.grid[ny][nx] === 0) {
+                    // Stay strictly inside the border: row/column 0 and
+                    // row/column size-1 remain walls on all four sides.
+                    if (nx > 0 && nx < this.size - 1 && ny > 0 && ny < this.size - 1 &&
+                            this.grid[ny][nx] === 0) {
                         this.grid[current.y + dir.dy / 2][current.x + dir.dx / 2] = 1;
                         this.grid[ny][nx] = 1;
                         stack.push({ x: nx, y: ny });
@@ -372,12 +418,76 @@ define(['jquery'], function($) {
             }
         }
 
+        /**
+         * Size the maze explicitly so that
+         *  - every cell is an exact square (same track size for rows and columns) and
+         *  - the #34495e background of .mazeword-container fits the grid precisely.
+         *
+         * The stylesheet values (90vw / 500px / 600px) do not know the configured
+         * maze size, so they are overridden here with computed pixel values.
+         */
+        applyLayout() {
+            if (!this.gridElement || !this.gridElement.length) {
+                return;
+            }
+
+            const gap = 1;      // .mazeword-grid { gap: 1px }
+            const border = 2;   // .mazeword-grid { border: 2px }
+            const padding = 10; // .mazeword-container { padding: 10px }
+            const size = this.size;
+
+            // Usable width: viewport minus page/container margins, capped on wide screens.
+            const viewport = document.documentElement.clientWidth || window.innerWidth || 1000;
+            const available = Math.max(240, Math.min(viewport - 2 * padding - 40, 1100));
+
+            // One single pixel size for columns and rows => perfectly square cells.
+            let cell = Math.floor((available - 2 * border - (size - 1) * gap) / size);
+            cell = Math.max(10, Math.min(cell, 40));
+
+            const inner = size * cell + (size - 1) * gap;
+            const gridBox = inner + 2 * border;
+            const containerBox = gridBox + 2 * padding;
+
+            this.cellSize = cell;
+            this.cellFontSize = Math.max(9, Math.min(Math.round(cell * 0.55), 24));
+
+            this.gridElement.css({
+                boxSizing: 'border-box',
+                flexShrink: '0',
+                width: gridBox + 'px',
+                height: gridBox + 'px',
+                maxWidth: 'none',
+                maxHeight: 'none',
+                gridTemplateColumns: 'repeat(' + size + ', ' + cell + 'px)',
+                gridTemplateRows: 'repeat(' + size + ', ' + cell + 'px)',
+                fontSize: this.cellFontSize + 'px'
+            });
+
+            // Background box = grid + padding on both sides.
+            if (this.containerElement && this.containerElement.length) {
+                this.containerElement.css({
+                    boxSizing: 'border-box',
+                    width: containerBox + 'px',
+                    maxWidth: 'none'
+                });
+            }
+
+            // Firework canvas must cover exactly the same area as the grid.
+            if (this.canvas) {
+                this.canvas.style.width = gridBox + 'px';
+                this.canvas.style.height = gridBox + 'px';
+                this.canvas.style.maxWidth = 'none';
+                this.canvas.style.maxHeight = 'none';
+            }
+        }
+
         render() {
             this.gridElement.empty();
 
             for (let y = 0; y < this.size; y++) {
                 for (let x = 0; x < this.size; x++) {
                     const cell = $('<div>').addClass('cell');
+                    cell.css('font-size', this.cellFontSize + 'px');
 
                     if (this.grid[y][x] === 0) {
                         cell.addClass('wall');
@@ -385,7 +495,7 @@ define(['jquery'], function($) {
                         const char = this.charGrid[y][x];
                         cell.text(char);
 
-                        if (x === 0 && y === 0) cell.addClass('start');
+                        if (x === this.startPos.x && y === this.startPos.y) cell.addClass('start');
                         if (x === this.goalPos.x && y === this.goalPos.y) cell.addClass('goal');
 
                         if (this.visitedSolutionSet.has(`${x},${y}`)) {

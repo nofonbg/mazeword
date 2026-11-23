@@ -11,20 +11,23 @@
     justify-content: center;
     align-items: center;
     margin: 20px auto;
-    max-width: 600px;
+    /* Background always wraps the grid exactly - the JS module overrides the
+       width with the final computed pixel value. */
+    width: max-content;
+    max-width: 100%;
 }
 
-/* Maze Grid */
+/* Maze Grid
+   The exact track size is set by mod_mazeword/mazeword (applyLayout) using the
+   configured maze size; the values below are only the pre-JS fallback. */
 .mazeword-grid {
     display: grid;
-    grid-template-columns: repeat(20, 1fr);
-    grid-template-rows: repeat(20, 1fr);
+    grid-template-columns: repeat(30, 30px);
+    grid-template-rows: repeat(30, 30px);
     gap: 1px;
     background-color: #1a252f;
-    width: 90vw;
-    height: 90vw;
-    max-width: 500px;
-    max-height: 500px;
+    width: max-content;
+    max-width: 100%;
     border: 2px solid #1a252f;
     z-index: 1;
 }
@@ -34,10 +37,10 @@
     position: absolute;
     top: 10px;
     left: 10px;
-    width: calc(90vw - 0px);
-    height: calc(90vw - 0px);
-    max-width: 500px;
-    max-height: 500px;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
     pointer-events: none;
     z-index: 20;
 }

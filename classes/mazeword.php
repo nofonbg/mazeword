@@ -33,8 +33,9 @@ class mazeword {
             $attempt = new \stdClass();
             $attempt->mazewordid = $this->mazeword->id;
             $attempt->userid = $userid;
-            $attempt->playerx = 0;
-            $attempt->playery = 0;
+            // Start cell = first room inside the border walls.
+            $attempt->playerx = 1;
+            $attempt->playery = 1;
             $attempt->visitedcells = json_encode([]);
             $attempt->solutionvisited = json_encode([]);
             $attempt->clearedcells = json_encode([]);
@@ -114,8 +115,8 @@ class mazeword {
             return false;
         }
 
-        $attempt->playerx = 0;
-        $attempt->playery = 0;
+        $attempt->playerx = 1;
+        $attempt->playery = 1;
         $attempt->visitedcells = json_encode([]);
         $attempt->solutionvisited = json_encode([]);
         $attempt->clearedcells = json_encode([]);
@@ -153,12 +154,20 @@ class mazeword {
     }
 
     public function get_game_config(): array {
+        $mazesize = (int) $this->mazeword->mazesize;
+        if ($mazesize % 2 === 0) {
+            // The maze needs an odd grid: rooms sit on odd coordinates and the
+            // outer row/column form the border walls. An even size would put
+            // the goal on a wall and leave the last row/column unused.
+            $mazesize++;
+        }
+
         return [
             'solutionword' => strtoupper($this->mazeword->solutionword),
             'wrongword1' => strtoupper($this->mazeword->wrongword1),
             'wrongword2' => strtoupper($this->mazeword->wrongword2),
             'wrongword3' => strtoupper($this->mazeword->wrongword3),
-            'mazesize' => (int) $this->mazeword->mazesize,
+            'mazesize' => $mazesize,
             'instanceid' => $this->mazeword->id,
             'cmid' => $this->cm->id,
             'sesskey' => sesskey(),

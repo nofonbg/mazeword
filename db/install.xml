@@ -15,7 +15,7 @@
         <FIELD NAME="wrongword1" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="wrongword2" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="wrongword3" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="mazesize" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" DEFAULT="20"/>
+        <FIELD NAME="mazesize" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" DEFAULT="21"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
       </FIELDS>

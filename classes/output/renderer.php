@@ -20,10 +20,12 @@ class renderer extends \plugin_renderer_base {
 
         $output = '';
 
-        $output .= '<style>
-.mazeword-container{position:relative;padding:10px;background:#34495e;border-radius:8px;box-shadow:0 10px 20px rgba(0,0,0,.3);display:flex;justify-content:center;align-items:center;margin:20px auto;max-width:600px}
-.mazeword-grid{display:grid;grid-template-columns:repeat(20,1fr);grid-template-rows:repeat(20,1fr);gap:1px;background-color:#1a252f;width:90vw;height:90vw;max-width:500px;max-height:500px;border:2px solid #1a252f;z-index:1}
-.mazeword-firework-canvas{position:absolute;top:10px;left:10px;width:calc(90vw - 0px);height:calc(90vw - 0px);max-width:500px;max-height:500px;pointer-events:none;z-index:20}
+        $ms = $config['mazesize'];
+        $output .= <<<CSS
+<style>
+.mazeword-container{position:relative;padding:10px;background:#34495e;border-radius:8px;box-shadow:0 10px 20px rgba(0,0,0,.3);display:flex;justify-content:center;align-items:center;margin:20px auto;width:max-content;max-width:100%}
+.mazeword-grid{display:grid;grid-template-columns:repeat({$ms},30px);grid-template-rows:repeat({$ms},30px);gap:1px;background-color:#1a252f;width:max-content;max-width:100%;border:2px solid #1a252f;z-index:1}
+.mazeword-firework-canvas{position:absolute;top:10px;left:10px;width:100%;height:100%;max-width:none;max-height:none;pointer-events:none;z-index:20}
 .cell{width:100%;height:100%;background-color:#ecf0f1;display:flex;justify-content:center;align-items:center;font-weight:bold;font-size:.8rem;color:#2c3e50;user-select:none;position:relative}
 .wall{background-color:#1a252f;color:transparent}
 .start{background-color:#27ae60;color:white}
@@ -49,11 +51,12 @@ class renderer extends \plugin_renderer_base {
 .mazeword-stats table{width:100%}
 .mazeword-stats td{padding:5px 10px}
 @media(min-width:600px){.mazeword-controls{grid-template-columns:repeat(3,70px);grid-template-rows:repeat(2,70px)}.cell{font-size:1rem}.mazeword-tracker-letter{width:35px;height:35px;line-height:35px;font-size:1rem}}
-</style>';
+</style>
+CSS;
 
         $output .= $OUTPUT->heading(format_string($mazeword->name));
 
-        if ($mazeword->intro) {
+        if (!empty($mazeword->intro)) {
             $output .= $OUTPUT->box_start('mod_introbox', 'mazewordintro');
             $output .= format_module_intro('mazeword', $mazeword, $instance->cm->id);
             $output .= $OUTPUT->box_end();
@@ -111,7 +114,7 @@ class renderer extends \plugin_renderer_base {
 
     function MazeGame(config, savedX, savedY, visitedCells, solutionVisited, clearedCells, collectedLetters, moveTrail, isCompleted) {
         this.config = config;
-        this.size = config.mazesize;
+        this.size = normalizeSize(config.mazesize);
         this.solutionWord = config.solutionword;
         this.wrongWords = [config.wrongword1, config.wrongword2, config.wrongword3];
         this.cmid = config.cmid;
@@ -129,22 +132,46 @@ class renderer extends \plugin_renderer_base {
         for (i = 0; i < visitedCells.length; i++) this.visitedCellsSet[visitedCells[i]] = true;
         for (i = 0; i < clearedCells.length; i++) this.clearedCells[clearedCells[i]] = true;
         for (i = 0; i < collectedLetters.length; i++) this.collectedLetters.push(collectedLetters[i]);
-        this.playerPos = {x: savedX, y: savedY};
-        this.moveTrail = moveTrail.length > 0 ? moveTrail : [{x: savedX, y: savedY}];
+        // Start cell is the first room inside the border; (0,0) is a legacy start.
+        this.startPos = {x: 1, y: 1};
+        var startX = parseInt(savedX, 10);
+        var startY = parseInt(savedY, 10);
+        if (!startX && !startY) {
+            startX = this.startPos.x;
+            startY = this.startPos.y;
+        }
+        this.playerPos = {x: startX, y: startY};
+        this.moveTrail = moveTrail.length > 0 ? moveTrail : [{x: startX, y: startY}];
         this.goalPos = {x: this.size - 2, y: this.size - 2};
         this.isGameOver = isCompleted;
-        this.isFirstMove = !isCompleted && savedX === 0 && savedY === 0;
+        this.isFirstMove = !isCompleted && startX === this.startPos.x && startY === this.startPos.y;
         this.gridElement = document.getElementById('mazeword-grid');
+        this.containerElement = document.getElementById('mazeword-container');
         this.statusElement = document.getElementById('mazeword-status');
         this.canvas = document.getElementById('mazeword-firework-canvas');
         this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
         this.particles = [];
+        this.cellSize = 0;
+        this.cellFontSize = 16;
         this.initGame();
+    }
+
+    // The maze grid must be odd sized so that all four border rows/columns can
+    // be walls and the goal (size-2, size-2) lands on a room.
+    function normalizeSize(configured) {
+        var size = parseInt(configured, 10) || 21;
+        return size % 2 === 0 ? size + 1 : size;
     }
 
     MazeGame.prototype.initGame = function() {
         this.generateMaze();
         this.addExtraDeadEnds();
+        // A saved position of an older layout may sit on a wall of the
+        // regenerated maze - without a valid start there is no solution path.
+        var px = this.playerPos.x, py = this.playerPos.y;
+        if (py < 0 || py >= this.size || px < 0 || px >= this.size || this.grid[py][px] !== 1) {
+            this.playerPos = {x: this.startPos.x, y: this.startPos.y};
+        }
         var solutionPath = this.findPath(this.playerPos, this.goalPos);
         var branches = this.findBranches(solutionPath);
         this.placeWords(solutionPath, branches);
@@ -161,6 +188,7 @@ class renderer extends \plugin_renderer_base {
                 this.charGrid[cl.y][cl.x] = '';
             }
         }
+        this.applyLayout();
         this.render();
         this.updateSolutionTracker();
         if (this.isGameOver) {
@@ -176,6 +204,56 @@ class renderer extends \plugin_renderer_base {
         }
     };
 
+    /**
+     * Size the maze explicitly so that every cell is an exact square and the
+     * #34495e background of .mazeword-container fits the grid precisely.
+     * The stylesheet values (90vw / 500px / 600px) do not know the configured
+     * maze size, therefore they are overridden here with computed pixel values.
+     */
+    MazeGame.prototype.applyLayout = function() {
+        if (!this.gridElement) return;
+        var gap = 1;      // .mazeword-grid { gap: 1px }
+        var border = 2;   // .mazeword-grid { border: 2px }
+        var padding = 10; // .mazeword-container { padding: 10px }
+        var size = this.size;
+        var viewport = document.documentElement.clientWidth || window.innerWidth || 1000;
+        var available = Math.max(240, Math.min(viewport - 2 * padding - 40, 1100));
+        // One single pixel size for columns and rows => square cells.
+        var cell = Math.floor((available - 2 * border - (size - 1) * gap) / size);
+        cell = Math.max(10, Math.min(cell, 40));
+        var inner = size * cell + (size - 1) * gap;
+        var gridBox = inner + 2 * border;
+        var containerBox = gridBox + 2 * padding;
+
+        this.cellSize = cell;
+        this.cellFontSize = Math.max(9, Math.min(Math.round(cell * 0.55), 24));
+
+        var gs = this.gridElement.style;
+        gs.boxSizing = 'border-box';
+        gs.flexShrink = '0';
+        gs.width = gridBox + 'px';
+        gs.height = gridBox + 'px';
+        gs.maxWidth = 'none';
+        gs.maxHeight = 'none';
+        gs.gridTemplateColumns = 'repeat(' + size + ', ' + cell + 'px)';
+        gs.gridTemplateRows = 'repeat(' + size + ', ' + cell + 'px)';
+        gs.fontSize = this.cellFontSize + 'px';
+
+        if (this.containerElement) {
+            var cs = this.containerElement.style;
+            cs.boxSizing = 'border-box';
+            cs.width = containerBox + 'px';
+            cs.maxWidth = 'none';
+        }
+
+        if (this.canvas) {
+            this.canvas.style.width = gridBox + 'px';
+            this.canvas.style.height = gridBox + 'px';
+            this.canvas.style.maxWidth = 'none';
+            this.canvas.style.maxHeight = 'none';
+        }
+    };
+
     MazeGame.prototype.generateMaze = function() {
         var y, x;
         this.grid = [];
@@ -184,8 +262,8 @@ class renderer extends \plugin_renderer_base {
             for (x = 0; x < this.size; x++) this.grid[y][x] = 0;
         }
         var stack = [];
-        this.grid[0][0] = 1;
-        stack.push({x: 0, y: 0});
+        this.grid[this.startPos.y][this.startPos.x] = 1;
+        stack.push({x: this.startPos.x, y: this.startPos.y});
         var dirs = [{dx:0,dy:-2},{dx:0,dy:2},{dx:-2,dy:0},{dx:2,dy:0}];
         while (stack.length > 0) {
             var current = stack[stack.length - 1];
@@ -195,7 +273,8 @@ class renderer extends \plugin_renderer_base {
                 var dir = shuffled[d];
                 var nx = current.x + dir.dx;
                 var ny = current.y + dir.dy;
-                if (nx >= 0 && nx < this.size && ny >= 0 && ny < this.size && this.grid[ny][nx] === 0) {
+                // Keep row/column 0 and size-1 as border walls on all four sides.
+                if (nx > 0 && nx < this.size - 1 && ny > 0 && ny < this.size - 1 && this.grid[ny][nx] === 0) {
                     this.grid[current.y + dir.dy / 2][current.x + dir.dx / 2] = 1;
                     this.grid[ny][nx] = 1;
                     stack.push({x: nx, y: ny});
@@ -345,11 +424,12 @@ class renderer extends \plugin_renderer_base {
             for (var x = 0; x < this.size; x++) {
                 var cell = document.createElement('div');
                 cell.className = 'cell';
+                cell.style.fontSize = this.cellFontSize + 'px';
                 if (this.grid[y][x] === 0) {
                     cell.className += ' wall';
                 } else {
                     cell.textContent = this.charGrid[y][x];
-                    if (x === 0 && y === 0) cell.className += ' start';
+                    if (x === this.startPos.x && y === this.startPos.y) cell.className += ' start';
                     if (x === this.goalPos.x && y === this.goalPos.y) cell.className += ' goal';
                     if (x === this.playerPos.x && y === this.playerPos.y) {
                         cell.className += ' player';
@@ -455,8 +535,8 @@ class renderer extends \plugin_renderer_base {
                 self.visitedCellsSet = {};
                 self.collectedLetters = [];
                 self.clearedCells = {};
-                self.moveTrail = [{x: 0, y: 0}];
-                self.playerPos = {x: 0, y: 0};
+                self.moveTrail = [{x: self.startPos.x, y: self.startPos.y}];
+                self.playerPos = {x: self.startPos.x, y: self.startPos.y};
                 self.isGameOver = false;
                 self.isFirstMove = true;
                 self.particles = [];
@@ -546,6 +626,7 @@ class renderer extends \plugin_renderer_base {
     document.querySelector('.mazeword-btn-down').addEventListener('click', function(e) { e.preventDefault(); if (!game.isGameOver) game.move(0, 1); });
     document.querySelector('.mazeword-btn-right').addEventListener('click', function(e) { e.preventDefault(); if (!game.isGameOver) game.move(1, 0); });
     document.getElementById('mazeword-reset-btn').addEventListener('click', function(e) { e.preventDefault(); game.resetGame(); });
+    window.addEventListener('resize', function() { if (game) game.applyLayout(); });
 
 })();
 </script>

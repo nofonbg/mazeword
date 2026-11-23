@@ -16,13 +16,23 @@ function mazeword_supports($feature): mixed {
         FEATURE_MOD_ARCHETYPE => MOD_ARCHETYPE_ACTIVITY,
         FEATURE_GROUPS => true,
         FEATURE_GROUPINGS => true,
+        FEATURE_MOD_INTRO => true,
         FEATURE_COMPLETION_TRACKS_VIEWS => true,
         FEATURE_GRADE_HAS_GRADE => false,
         FEATURE_GRADE_OUTCOMES => false,
         FEATURE_BACKUP_MOODLE2 => true,
-        FEATURE_SHOW_DESCRIPTION => true,
         default => null,
     };
+}
+
+/**
+ * Upgrade function.
+ *
+ * @param int $oldversion The version we are upgrading from.
+ * @return bool Always returns true.
+ */
+function xmldb_mazeword_upgrade($oldversion) {
+    return true;
 }
 
 /**
@@ -38,17 +48,13 @@ function mazeword_add_instance(stdClass $data, ?object $mform = null): int {
     $data->timecreated = time();
     $data->timemodified = $data->timecreated;
 
-    // Ensure default values for required fields.
-    if (!isset($data->introformat)) {
-        $data->introformat = FORMAT_HTML;
-    }
     // Convert words to uppercase, handle ß → SS.
     $data->solutionword = strtoupper(str_replace('ß', 'SS', trim($data->solutionword ?? '')));
     $data->wrongword1 = strtoupper(str_replace('ß', 'SS', trim($data->wrongword1 ?? '')));
     $data->wrongword2 = strtoupper(str_replace('ß', 'SS', trim($data->wrongword2 ?? '')));
     $data->wrongword3 = strtoupper(str_replace('ß', 'SS', trim($data->wrongword3 ?? '')));
     if (!isset($data->mazesize) || empty($data->mazesize)) {
-        $data->mazesize = 20;
+        $data->mazesize = 21;
     }
 
     $data->id = $DB->insert_record('mazeword', $data);

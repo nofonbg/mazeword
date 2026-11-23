@@ -12,6 +12,7 @@ $string['mazeword:manageattempts'] = 'Manage Maze Word attempts';
 $string['mazeword:configure'] = 'Configure Maze Word activity';
 
 // Form strings.
+$string['activityname'] = 'Activity name';
 $string['mazewordsettings'] = 'Maze Word Settings';
 $string['solutionword'] = 'Solution word';
 $string['solutionword_help'] = 'The word that students must find by navigating the correct path through the maze. This word will be placed along the solution path.';

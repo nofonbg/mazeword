@@ -1,14 +1,17 @@
+![](https://github.com/nofonbg/mazeword/blob/main/pix/icon_large.svg)  
+
+
 # Modul: Maze Word (mod_mazeword)
 
 Ein interaktives Labyrinth-Worträtsel fuer Moodle.
 
 ## Beschreibung
 
-Schueler navigieren durch ein generiertes 20x20-Labyrinth und suchen den Weg, der das Lösungswort bildet. Die Buchstaben des Lösungswortes werden rot hervorgehoben und "folgen" dem Spieler als Kette. Sackgassen enthalten falsche Wörter als Ablenkung. Beim Erreichen des Ziels mit allen gesammelten Buchstaben gibt es ein Feuerwerk.
+Schueler navigieren durch ein generiertes Labyrinth (Standard 21x21) und suchen den Weg, der das Lösungswort bildet. Die Buchstaben des Lösungswortes werden rot hervorgehoben und "folgen" dem Spieler als Kette. Sackgassen enthalten falsche Wörter als Ablenkung. Beim Erreichen des Ziels mit allen gesammelten Buchstaben gibt es ein Feuerwerk.
 
 ### Features
 
-- **Dynamisches Labyrinth** – wird bei jedem Start neu generiert (10x10 bis 30x30)
+- **Dynamisches Labyrinth** – wird bei jedem Start neu generiert (11x11 bis 31x31, ungerade Größe mit geschlossenem Rand auf allen vier Seiten)
 - **Loesungswort** – Buchstaben auf dem korrekten Weg, werden rot gesammelt
 - **Wurm-Effekt** – gesammelte Buchstaben folgen dem Cursor als Kette
 - **Sackgassen** – 3 Ablenkungswörter in Nebenwegen
@@ -51,13 +54,13 @@ Keine globalen Einstellungen.
 | Falsches Wort 1 | Ablenkung in Sackgasse 1 |
 | Falsches Wort 2 | Ablenkung in Sackgasse 2 |
 | Falsches Wort 3 | Ablenkung in Sackgasse 3 |
-| Laabyrinth-Groesse | 10x10, 15x15, 20x20 (Standard), 25x25, 30x30 |
+| Laabyrinth-Groesse | 11x11, 15x15, 21x21 (Standard), 25x25, 31x31 – nur ungerade Werte, damit alle vier Ränder Wände sind |
 
 ## Spielablauf
 
 1. Lehrer legt Aktivitaet an mit Loesungswort und 3 Falschwoertern
 2. Schueler oeffnet Aktivitaet, Labyrinth wird generiert
-3. Schueler navigiert von Start (grün) zum Ziel (rot)
+3. Schueler navigiert von Start (grün, innen links oben) zum Ziel (rot)
 4. Ueberfahrene normale Buchstaben verschwinden
 5. Loesungsbuchstaben werden rot und folgen als Kette
 6. Sieg: Alle Loesungsbuchstaben gesammelt + Ziel erreicht
@@ -73,11 +76,11 @@ Keine globalen Einstellungen.
 | id | int | Primärschluessel |
 | course | int | Kurs-ID |
 | name | varchar(255) | Aktivitaetsname |
-| intro | text | Beschreibung |
+| intro | text | Beschreibung (optional) |
 | introformat | int | HTML-Format |
 | solutionword | varchar(255) | Loesungswort (uppercase) |
 | wrongword1-3 | varchar(255) | Falschwoerter |
-| mazesize | int | Labyrinth-Groesse |
+| mazesize | int | Labyrinth-Groesse (ungerade Werte; gerade Altbestand wird beim Upgrade auf +1 angehoben) |
 | timecreated | int | Erstellt-Zeitstempel |
 | timemodified | int | Geaendert-Zeitstempel |
 
