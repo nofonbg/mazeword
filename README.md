@@ -1,7 +1,7 @@
 # mazeword
 find a solution word in a maze  
 
-neither issues nor pull requests nor anything else will be responded, use as it is!
+neither issüs nor pull reqüsts nor anything else will be responded, use as it is!
 
 tested only with moodle 6dev(Build: 20261117) 
 
@@ -14,11 +14,11 @@ created with MiMo V2.5
 
 # Modul: Maze Word (mod_mazeword)
 
-Ein interaktives Labyrinth-Worträtsel fuer Moodle.
+Ein interaktives Labyrinth-Worträtsel fur Moodle.
 
 ## Beschreibung
 
-Schueler navigieren durch ein generiertes 20x20-Labyrinth und suchen den Weg, der das Lösungswort bildet. Die Buchstaben des Lösungswortes werden rot hervorgehoben und "folgen" dem Spieler als Kette. Sackgassen enthalten falsche Wörter als Ablenkung. Beim Erreichen des Ziels mit allen gesammelten Buchstaben gibt es ein Feuerwerk.
+Schüler navigieren durch ein generiertes 20x20-Labyrinth und suchen den Weg, der das Lösungswort bildet. Die Buchstaben des Lösungswortes werden rot hervorgehoben und "folgen" dem Spieler als Kette. Sackgassen enthalten falsche Wörter als Ablenkung. Beim Erreichen des Ziels mit allen gesammelten Buchstaben gibt es ein Feürwerk.
 
 ### Features
 
@@ -26,10 +26,10 @@ Schueler navigieren durch ein generiertes 20x20-Labyrinth und suchen den Weg, de
 - **Loesungswort** – Buchstaben auf dem korrekten Weg, werden rot gesammelt
 - **Wurm-Effekt** – gesammelte Buchstaben folgen dem Cursor als Kette
 - **Sackgassen** – 3 Ablenkungswörter in Nebenwegen
-- **Tastatursteuerung** – Pfeiltasten oder WASD
+- **Tastatursteürung** – Pfeiltasten oder WASD
 - **On-Screen-Buttons** – für Mobile-Geräte
 - **Spielstand** – wird automatisch gespeichert (Position, gesammelte Buchstaben)
-- **Umlaute** – Ä, Ö, Ü werden unterstuetzt, ß wird zu SS konvertiert
+- **Umlaute** – Ä, Ö, Ü werden unterstützt, ß wird zu SS konvertiert
 - **Lehrer-Statistik** – Anzahl Versuche und Loesungen
 
 ## Anforderungen
@@ -43,7 +43,7 @@ Schueler navigieren durch ein generiertes 20x20-Labyrinth und suchen den Weg, de
 2. Im Moodle-Admin unter *Erweiterungen* das Plugin installieren
 3. Datenbanktabellen werden automatisch angelegt
 
-### Manuelle Installation
+### Manülle Installation
 
 ```bash
 cp -r mazeword /path/to/moodle/mod/
@@ -57,7 +57,7 @@ php admin/cli/upgrade.php
 
 Keine globalen Einstellungen.
 
-### Aktivitaets-Einstellungen (Lehrer)
+### Aktivitäts-Einstellungen (Lehrer)
 
 | Feld | Beschreibung |
 |------|-------------|
@@ -69,10 +69,10 @@ Keine globalen Einstellungen.
 
 ## Spielablauf
 
-1. Lehrer legt Aktivitaet an mit Loesungswort und 3 Falschwoertern
-2. Schueler oeffnet Aktivitaet, Labyrinth wird generiert
-3. Schueler navigiert von Start (grün) zum Ziel (rot)
-4. Ueberfahrene normale Buchstaben verschwinden
+1. Lehrer legt Aktivität an mit Loesungswort und 3 Falschwoertern
+2. Schüler oeffnet Aktivität, Labyrinth wird generiert
+3. Schüler navigiert von Start (grün) zum Ziel (rot)
+4. überfahrene normale Buchstaben verschwinden
 5. Loesungsbuchstaben werden rot und folgen als Kette
 6. Sieg: Alle Loesungsbuchstaben gesammelt + Ziel erreicht
 
@@ -80,29 +80,29 @@ Keine globalen Einstellungen.
 
 ### Datenbank
 
-**mdl_mazeword** – Aktivitaetsinstanz
+**mdl_mazeword** – Aktivitätsinstanz
 
 | Feld | Typ | Beschreibung |
 |------|-----|-------------|
-| id | int | Primärschluessel |
+| id | int | Primärschlüssel |
 | course | int | Kurs-ID |
-| name | varchar(255) | Aktivitaetsname |
+| name | varchar(255) | Aktivitätsname |
 | intro | text | Beschreibung |
 | introformat | int | HTML-Format |
 | solutionword | varchar(255) | Loesungswort (uppercase) |
 | wrongword1-3 | varchar(255) | Falschwoerter |
 | mazesize | int | Labyrinth-Groesse |
 | timecreated | int | Erstellt-Zeitstempel |
-| timemodified | int | Geaendert-Zeitstempel |
+| timemodified | int | Geändert-Zeitstempel |
 
-**mdl_mazeword_attempts** – Schueler-Versuche
+**mdl_mazeword_attempts** – Schüler-Versuche
 
 | Feld | Typ | Beschreibung |
 |------|-----|-------------|
-| id | int | Primärschluessel |
+| id | int | Primärschlüssel |
 | mazewordid | int | FK zu mdl_mazeword |
 | userid | int | FK zu mdl_user |
-| playerx/playery | int | Aktuelle Spielerposition |
+| playerx/playery | int | Aktülle Spielerposition |
 | visitedcells | text | JSON: Besuchte Zellen |
 | solutionvisited | text | JSON: Besuchte Loesungszellen |
 | clearedcells | text | JSON: Geloeschte Zellen |
@@ -121,7 +121,7 @@ mod/mazeword/
 ├── mod_form.php                # Lehrer-Formular
 ├── view.php                    # Hauptseite + AJAX
 ├── locallib.php                # Hilfsfunktionen
-├── index.php                   # Kursuebersicht
+├── index.php                   # Kursübersicht
 ├── settings.php                # Admin-Einstellungen
 ├── styles.css                  # CSS (Referenz)
 ├── lang/en/mazeword.php        # Englische Strings
@@ -154,23 +154,23 @@ mod/mazeword/
 
 | Berechtigung | Beschreibung |
 |-------------|-------------|
-| mod/mazeword:addinstance | Aktivitaet anlegen |
-| mod/mazeword:view | Aktivitaet ansehen |
+| mod/mazeword:addinstance | Aktivität anlegen |
+| mod/mazeword:view | Aktivität ansehen |
 | mod/mazeword:attempt | Spiel spielen |
 | mod/mazeword:manageattempts | Versuche verwalten |
-| mod/mazeword:configure | Aktivitaet konfigurieren |
+| mod/mazeword:configure | Aktivität konfigurieren |
 
 ### Backup/Restore
 
-Unterstuetzt vollstaendiges Backup und Restore inklusive:
-- Aktivitaetsinstanz (Loesungswort, Falschwoerter, Laabyrinth-Groesse)
-- Schueler-Versuche (Position, gesammelte Buchstaben, Spielstand)
+Unterstützt vollständiges Backup und Restore inklusive:
+- Aktivitätsinstanz (Loesungswort, Falschwoerter, Laabyrinth-Groesse)
+- Schüler-Versuche (Position, gesammelte Buchstaben, Spielstand)
 - Dateien (Intro-Beschreibung)
-- User-Mapping bei Kursuebertrag
+- User-Mapping bei Kursübertrag
 
 ## Lizenz
 
-GPLv3 oder spaeter
+GPLv3 oder später
 
 ## Autor
 
@@ -184,8 +184,8 @@ Norbert Forster
 - todo: Hinweis auf Spielfeldgröße bei langen Lösungswörtern
 
 ### Version 1.1 (2026-08-09)
-- Umlaute (Ä, Ö, Ü) unterstuetzt, ß wird zu SS konvertiert
-- Backup/Restore-Funktionalitaet hinzugefuegt
+- Umlaute (Ä, Ö, Ü als Großbuchstaben) unterstützt, ß wird zu SS konvertiert
+- Backup/Restore-Funktionalität hinzugefügt
 - CSS inline im Renderer (kein externer Import noetig)
 - DSGVO-konforme Datenverarbeitung
 - Verschiedene Bugfixes
@@ -193,7 +193,7 @@ Norbert Forster
 ### Version 1.0 (2026-08-09)
 - Initiale Version
 - Dynamisches Labyrinth mit Loesungswort
-- Wurm-Effekt fuer gesammelte Buchstaben
-- Tastatur- und Button-Steuerung
+- Wurm-Effekt für gesammelte Buchstaben
+- Tastatur- und Button-Steürung
 - Automatische Spielstandspeicherung
 - Lehrer-Statistik
