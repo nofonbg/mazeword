@@ -5,8 +5,6 @@ neither issues nor pull requests nor anything else will be responded, use as it 
 
 tested only with moodle 6dev(Build: 20261117) 
 
-created with MiMo V2.5
-
 ![](https://github.com/nofonbg/mazeword/blob/main/pix/icon_large.svg)  
 <img src="docs/maze.gif" alt="Vorschau mit kleinem und großem Spielfeld" width="700">
 
